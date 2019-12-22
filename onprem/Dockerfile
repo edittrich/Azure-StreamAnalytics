@@ -6,7 +6,6 @@ WORKDIR reference-architectures/data/streaming_asa/onprem/DataLoader
 RUN dotnet build
 RUN dotnet publish -f netcoreapp2.0 -c Release
 
-
 FROM microsoft/dotnet:2.1-runtime AS runtime
 WORKDIR DataLoader
 COPY --from=build reference-architectures/data/streaming_asa/onprem/DataLoader/bin/Release/netcoreapp2.0/publish .
