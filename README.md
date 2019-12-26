@@ -70,7 +70,8 @@ https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935
         --resource-group $resourceGroup \
         --query primaryConnectionString
 
-    # Customize main.env
+    # Customize keys in main.env
+
     # Run dataloader
     cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
     docker run -v d:/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile:/DataFile --env-file=main.env dataloader:latest
@@ -82,3 +83,4 @@ https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935
     az group delete --name $resourceGroup
 
 ```
+
