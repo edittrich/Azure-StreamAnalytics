@@ -10,8 +10,6 @@ https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935
 ## Customization
 
 ```bash
-cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics
-
 # Export environment variables
 export resourceGroup='rg-data-dev-001'
 export resourceLocation='westeurope'
@@ -24,6 +22,7 @@ export eventHubNamespace='evhns-data-dev'
 az group create --name $resourceGroup --location $resourceLocation
 
 # Deploy resources
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics
 az group deployment create --resource-group $resourceGroup \
 --template-file ./azure/deployresources.json --parameters \
 eventHubNamespace=$eventHubNamespace \
@@ -70,9 +69,10 @@ az eventhubs eventhub authorization-rule keys list \
     --query primaryConnectionString
 
 # Customize keys in main.env
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+nano main.env
 
 # Run dataloader
-cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
 docker run -v d:/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile:/DataFile --env-file=main.env dataloader:latest
 
 docker ps
