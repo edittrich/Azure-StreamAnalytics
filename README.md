@@ -10,77 +10,74 @@ https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935
 ## Customization
 
 ```bash
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics
 
-    cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics
+# Export environment variables
+export resourceGroup='rg-data-dev-001'
+export resourceLocation='westeurope'
+export cosmosDatabaseAccount='cosdbac-data-dev'
+export cosmosDatabase='cosdb-data-dev'
+export cosmosDataBaseCollection='cosdbcl-data-dev'
+export eventHubNamespace='evhns-data-dev'
 
-    # Export environment variables
-    export resourceGroup='rg-data-dev-001'
-    export resourceLocation='westeurope'
-    export cosmosDatabaseAccount='cosdbac-data-dev'
-    export cosmosDatabase='cosdb-data-dev'
-    export cosmosDataBaseCollection='cosdbcl-data-dev'
-    export eventHubNamespace='evhns-data-dev'
+# Create a resource group
+az group create --name $resourceGroup --location $resourceLocation
 
-    # Create a resource group
-    az group create --name $resourceGroup --location $resourceLocation
+# Deploy resources
+az group deployment create --resource-group $resourceGroup \
+--template-file ./azure/deployresources.json --parameters \
+eventHubNamespace=$eventHubNamespace \
+outputCosmosDatabaseAccount=$cosmosDatabaseAccount \
+outputCosmosDatabase=$cosmosDatabase \
+outputCosmosDatabaseCollection=$cosmosDataBaseCollection
 
-    # Deploy resources
-    az group deployment create --resource-group $resourceGroup \
-    --template-file ./azure/deployresources.json --parameters \
-    eventHubNamespace=$eventHubNamespace \
-    outputCosmosDatabaseAccount=$cosmosDatabaseAccount \
-    outputCosmosDatabase=$cosmosDatabase \
-    outputCosmosDatabaseCollection=$cosmosDataBaseCollection
+# Create a database
+az cosmosdb database create --name $cosmosDatabaseAccount \
+    --db-name $cosmosDatabase \
+    --resource-group $resourceGroup
 
-    # Create a database
-    az cosmosdb database create --name $cosmosDatabaseAccount \
-        --db-name $cosmosDatabase \
-        --resource-group $resourceGroup
+# Create a collection
+az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
+    --name $cosmosDatabaseAccount \
+    --db-name $cosmosDatabase \
+    --resource-group $resourceGroup
 
-    # Create a collection
-    az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
-        --name $cosmosDatabaseAccount \
-        --db-name $cosmosDatabase \
-        --resource-group $resourceGroup
+# Start Stream Analytics job
 
-    # Start Stream Analytics job
+# Build dataloader
+cd /d/Documents/Workspaces/Git/Azure/
+git clone git@github.com:edittrich/Azure-StreamAnalytics
+mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
+unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
 
-    # Build dataloader
-    cd /d/Documents/Workspaces/Git/Azure/
-    git clone git@github.com:edittrich/Azure-StreamAnalytics
-    mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
-    unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+docker build --no-cache -t dataloader .
 
-    cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
-    docker build --no-cache -t dataloader .
+# RIDE_EVENT_HUB
+az eventhubs eventhub authorization-rule keys list \
+    --eventhub-name taxi-ride \
+    --name taxi-ride-asa-access-policy \
+    --namespace-name $eventHubNamespace \
+    --resource-group $resourceGroup \
+    --query primaryConnectionString
 
-    # RIDE_EVENT_HUB
-    az eventhubs eventhub authorization-rule keys list \
-        --eventhub-name taxi-ride \
-        --name taxi-ride-asa-access-policy \
-        --namespace-name $eventHubNamespace \
-        --resource-group $resourceGroup \
-        --query primaryConnectionString
+# FARE_EVENT_HUB
+az eventhubs eventhub authorization-rule keys list \
+    --eventhub-name taxi-fare \
+    --name taxi-fare-asa-access-policy \
+    --namespace-name $eventHubNamespace \
+    --resource-group $resourceGroup \
+    --query primaryConnectionString
 
-    # FARE_EVENT_HUB
-    az eventhubs eventhub authorization-rule keys list \
-        --eventhub-name taxi-fare \
-        --name taxi-fare-asa-access-policy \
-        --namespace-name $eventHubNamespace \
-        --resource-group $resourceGroup \
-        --query primaryConnectionString
+# Customize keys in main.env
 
-    # Customize keys in main.env
+# Run dataloader
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+docker run -v d:/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile:/DataFile --env-file=main.env dataloader:latest
 
-    # Run dataloader
-    cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
-    docker run -v d:/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile:/DataFile --env-file=main.env dataloader:latest
+docker ps
+docker stop <CONTAINER ID>
 
-    docker ps
-    docker stop <CONTAINER ID>
-
-    # Delete resources
-    az group delete --name $resourceGroup
-
+# Delete resources
+az group delete --name $resourceGroup
 ```
-
