@@ -168,3 +168,80 @@ Created 30000 records for TaxiFare
 ```
 
 Let the program run for at least 5 minutes, which is the window defined in the Stream Analytics query. To verify the Stream Analytics job is running correctly, open the Azure portal and navigate to the Cosmos DB database. Open the **Data Explorer** blade and view the documents. 
+
+https://docs.microsoft.com/de-de/azure/architecture/reference-architectures/data/stream-processing-stream-analytics
+https://github.com/mspnp/azure-stream-analytics-data-pipeline
+
+https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935
+
+    ```bash
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics
+
+# Export environment variables
+export resourceGroup='rg-data-dev-001'
+export resourceLocation='westeurope'
+export cosmosDatabaseAccount='cosdbac-data-dev'
+export cosmosDatabase='cosdb-data-dev'
+export cosmosDataBaseCollection='cosdbcl-data-dev'
+export eventHubNamespace='evhns-data-dev'
+
+# Create a resource group
+az group create --name $resourceGroup --location $resourceLocation
+
+# Deploy resources
+az group deployment create --resource-group $resourceGroup \
+  --template-file ./azure/deployresources.json --parameters \
+  eventHubNamespace=$eventHubNamespace \
+  outputCosmosDatabaseAccount=$cosmosDatabaseAccount \
+  outputCosmosDatabase=$cosmosDatabase \
+  outputCosmosDatabaseCollection=$cosmosDataBaseCollection
+
+# Create a database
+az cosmosdb database create --name $cosmosDatabaseAccount \
+    --db-name $cosmosDatabase \
+    --resource-group $resourceGroup
+
+# Create a collection
+az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
+    --name $cosmosDatabaseAccount \
+    --db-name $cosmosDatabase \
+    --resource-group $resourceGroup
+
+# Start Stream Analytics job
+
+# Build dataloader
+cd /d/Documents/Workspaces/Git/Azure/
+git clone git@github.com:edittrich/Azure-StreamAnalytics
+mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
+unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
+
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+docker build --no-cache -t dataloader .
+
+# RIDE_EVENT_HUB
+az eventhubs eventhub authorization-rule keys list \
+    --eventhub-name taxi-ride \
+    --name taxi-ride-asa-access-policy \
+    --namespace-name $eventHubNamespace \
+    --resource-group $resourceGroup \
+    --query primaryConnectionString
+
+# FARE_EVENT_HUB
+az eventhubs eventhub authorization-rule keys list \
+    --eventhub-name taxi-fare \
+    --name taxi-fare-asa-access-policy \
+    --namespace-name $eventHubNamespace \
+    --resource-group $resourceGroup \
+    --query primaryConnectionString
+
+# Customize main.env
+# Run dataloader
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+docker run -v d:/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile:/DataFile --env-file=main.env dataloader:latest
+
+docker ps
+docker stop <CONTAINER ID>
+
+# Delete resources
+az group delete --name $resourceGroup
+    ```
