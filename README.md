@@ -10,6 +10,10 @@ https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935
 ## Customization
 
 ```bash
+# Create project
+cd /d/Documents/Workspaces/Git/Azure/
+git clone git@github.com:edittrich/Azure-StreamAnalytics
+
 # Export environment variables
 export resourceGroup='rg-data-dev-001'
 export resourceLocation='westeurope'
@@ -44,8 +48,6 @@ az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
 # Start Stream Analytics job
 
 # Build dataloader
-cd /d/Documents/Workspaces/Git/Azure/
-git clone git@github.com:edittrich/Azure-StreamAnalytics
 mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
 unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
 
