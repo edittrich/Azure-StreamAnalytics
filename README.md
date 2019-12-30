@@ -52,9 +52,6 @@ az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
 # Start Stream Analytics job
 
 # Build dataloader
-mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
-unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
-
 cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
 docker build --no-cache -t dataloader .
 
@@ -79,6 +76,9 @@ cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
 nano main.env
 
 # Run dataloader
+mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
+unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
+
 docker run -v d:/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile:/DataFile --env-file=main.env dataloader:latest
 
 docker ps
