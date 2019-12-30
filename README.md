@@ -75,6 +75,10 @@ az eventhubs eventhub authorization-rule keys list \
 cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
 nano main.env
 
+# Build dataloader
+cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+docker build --no-cache -t dataloader .
+
 # Run dataloader
 mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
 unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
