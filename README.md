@@ -10,6 +10,10 @@ https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935
 ## Customization
 
 ```bash
+# Login to Azure
+az login
+az account set --subscription edittrich
+
 # Create project
 cd /d/Documents/Workspaces/Git/Azure/
 git clone git@github.com:edittrich/Azure-StreamAnalytics
