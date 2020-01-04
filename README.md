@@ -56,10 +56,6 @@ az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
 
 # Start Stream Analytics job
 
-# Build dataloader
-cd $PRJDIR/onprem
-docker build --no-cache -t dataloader .
-
 # RIDE_EVENT_HUB
 az eventhubs eventhub authorization-rule keys list \
     --eventhub-name taxi-ride \
