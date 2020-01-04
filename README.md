@@ -3,11 +3,11 @@
 ## Links
 https://docs.microsoft.com/de-de/azure/architecture/reference-architectures/data/stream-processing-stream-analytics  
 https://github.com/mspnp/azure-stream-analytics-data-pipeline  
-https://github.com/edittrich/Azure-StreamAnalytics  
 
 https://uofi.app.box.com/v/NYCtaxidata/folder/2332219935  
 
 ## Customization
+https://github.com/edittrich/Azure-StreamAnalytics  
 
 ```bash
 # Login to Azure
@@ -15,8 +15,13 @@ az login
 az account set --subscription edittrich
 
 # Create project
-cd /d/Documents/Workspaces/Git/Azure/
-git clone git@github.com:edittrich/Azure-StreamAnalytics
+export PRJROOT=/home/edittrich/Documents/workspaces/git/azure
+export PRJDIR=$PRJROOT/azure-streamanalytics
+
+mkdir -p $PRJROOT
+cd $PRJROOT
+git clone git@github.com:edittrich/azure-streamanalytics
+cd $PRJDIR
 
 # Export environment variables
 export resourceGroup='rg-data-dev-001'
