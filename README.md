@@ -77,8 +77,8 @@ az eventhubs eventhub authorization-rule keys list \
     --query primaryConnectionString
 
 # Customize keys in main.env
-cd $PRJDIR/onprem
-nano main.env
+cp $PRJDIR/onprem/main-template.env $PRJDIR/onprem/main.env
+nano $PRJDIR/onprem/main.env
 
 # Build dataloader
 cd $PRJDIR/onprem
@@ -88,6 +88,7 @@ docker build --no-cache -t dataloader .
 mkdir $PRJDIR/DataFile
 unzip $DWNDIR/FOIL2013.zip -d $PRJDIR/DataFile
 
+cd $PRJDIR/onprem
 docker run -v $PRJDIR/DataFile:/DataFile --env-file=main.env dataloader:latest
 
 docker ps
