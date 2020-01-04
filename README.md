@@ -17,6 +17,7 @@ az account set --subscription edittrich
 # Create project
 export PRJROOT=/home/edittrich/Documents/workspaces/git/azure
 export PRJDIR=$PRJROOT/azure-streamanalytics
+export DWNDIR=/home/edittrich/Downloads
 
 mkdir -p $PRJROOT
 cd $PRJROOT
@@ -35,7 +36,6 @@ export eventHubNamespace='evhns-data-dev'
 az group create --name $resourceGroup --location $resourceLocation
 
 # Deploy resources
-cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics
 az group deployment create --resource-group $resourceGroup \
 --template-file ./azure/deployresources.json --parameters \
 eventHubNamespace=$eventHubNamespace \
@@ -57,7 +57,7 @@ az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
 # Start Stream Analytics job
 
 # Build dataloader
-cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+cd $PRJDIR/onprem
 docker build --no-cache -t dataloader .
 
 # RIDE_EVENT_HUB
@@ -77,18 +77,18 @@ az eventhubs eventhub authorization-rule keys list \
     --query primaryConnectionString
 
 # Customize keys in main.env
-cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+cd $PRJDIR/onprem
 nano main.env
 
 # Build dataloader
-cd /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/onprem
+cd $PRJDIR/onprem
 docker build --no-cache -t dataloader .
 
 # Run dataloader
-mkdir /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
-unzip /d/Documents/Workspaces/Git/Azure/FOIL2013.zip -d /d/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile
+mkdir $PRJDIR/DataFile
+unzip $DWNDIR/FOIL2013.zip -d $PRJDIR/DataFile
 
-docker run -v d:/Documents/Workspaces/Git/Azure/Azure-StreamAnalytics/DataFile:/DataFile --env-file=main.env dataloader:latest
+docker run -v $PRJDIR/DataFile:/DataFile --env-file=main.env dataloader:latest
 
 docker ps
 docker stop <CONTAINER ID>
