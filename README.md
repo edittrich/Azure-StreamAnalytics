@@ -15,14 +15,16 @@ az login
 az account set --subscription edittrich
 
 # Create project
+export PRJROOT=/d/Documents/Workspaces/Git/Azure
+export DWNDIR=/d/Documents/Workspaces/Projects/Azure
 export PRJROOT=/home/edittrich/Documents/workspaces/git/azure
-export PRJDIR=$PRJROOT/azure-streamanalytics
 export DWNDIR=/home/edittrich/Downloads
+
+export PRJDIR=$PRJROOT/azure-streamanalytics
 
 mkdir -p $PRJROOT
 cd $PRJROOT
 git clone git@github.com:edittrich/azure-streamanalytics
-cd $PRJDIR
 
 # Export environment variables
 export resourceGroup='rg-data-dev-001'
@@ -36,6 +38,7 @@ export eventHubNamespace='evhns-data-dev'
 az group create --name $resourceGroup --location $resourceLocation
 
 # Deploy resources
+cd $PRJDIR
 az group deployment create --resource-group $resourceGroup \
 --template-file ./azure/deployresources.json --parameters \
 eventHubNamespace=$eventHubNamespace \
