@@ -59,7 +59,7 @@ az cosmosdb collection create --collection-name $cosmosDataBaseCollection \
 
 # Start Stream Analytics job
 
-# RIDE_EVENT_HUB
+# Customize connection string
 az eventhubs eventhub authorization-rule keys list \
     --eventhub-name taxi-ride \
     --name taxi-ride-asa-access-policy \
@@ -67,7 +67,6 @@ az eventhubs eventhub authorization-rule keys list \
     --resource-group $resourceGroup \
     --query primaryConnectionString
 
-# FARE_EVENT_HUB
 az eventhubs eventhub authorization-rule keys list \
     --eventhub-name taxi-fare \
     --name taxi-fare-asa-access-policy \
@@ -75,7 +74,6 @@ az eventhubs eventhub authorization-rule keys list \
     --resource-group $resourceGroup \
     --query primaryConnectionString
 
-# Customize keys in main.env
 cp $PRJDIR/onprem/main-template.env $PRJDIR/onprem/main.env
 nano $PRJDIR/onprem/main.env
 
@@ -83,10 +81,10 @@ nano $PRJDIR/onprem/main.env
 cd $PRJDIR/onprem
 docker build --no-cache -t dataloader .
 
-# Run dataloader
 mkdir $PRJDIR/DataFile
 unzip $DWNDIR/FOIL2013.zip -d $PRJDIR/DataFile
 
+# Run dataloader
 cd $PRJDIR/onprem
 docker run -v $PRJDIR/DataFile:/DataFile --env-file=main.env dataloader:latest
 
